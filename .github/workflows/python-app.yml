@@ -16,6 +16,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-    - name: Test with unittest
+    #- name: Test with unittest
+    #  run: |
+    #    python S16/test_cases.py
+
+    - name: Test with unittest S17 - 1
       run: |
-        python S16/test_cases.py
+        python S17/test_validate.py
+
+    - name: Test with unittest S17 - 2
+      run: |
+        python S17/test_merge.py
