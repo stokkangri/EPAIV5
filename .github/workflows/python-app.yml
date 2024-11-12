@@ -29,3 +29,8 @@ jobs:
     - name: Test with unittest S17 - 2
       run: |
         python S17/test_merge.py
+
+    - name: Test with unittest S18
+      run: |
+        pip install marshmallow
+        python S18/test_assignment.py
