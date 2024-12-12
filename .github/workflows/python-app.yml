@@ -22,19 +22,23 @@ jobs:
     #  run: |
     #    python S16/test_cases.py
 
-    - name: Test with unittest S17 - 1
-      run: |
-        python S17/test_validate.py
+    #- name: Test with unittest S17 - 1
+    #  run: |
+    #    python S17/test_validate.py
 
-    - name: Test with unittest S17 - 2
-      run: |
-        python S17/test_merge.py
+    #- name: Test with unittest S17 - 2
+    #  run: |
+    #    python S17/test_merge.py
 
-    - name: Test with unittest S18
-      run: |
-        pip install marshmallow
-        python S18/test_assignment.py
+    #- name: Test with unittest S18
+    #  run: |
+    #    pip install marshmallow
+    #    python S18/test_assignment.py
 
-    - name: Test with unittest S19
+    #- name: Test with unittest S19
+    #  run: |
+    #    python S19/test_smart_device.py
+
+    - name: Test with unittest S20
       run: |
-        python S19/test_smart_device.py
+        pytest --maxfail=1 --disable-warnings -q
