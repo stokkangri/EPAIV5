@@ -51,4 +51,8 @@ def test_validated_attribute():
     with pytest.raises(ValueError):
            validated_attr.value = -10  # Should raise error for negative value
 
+test_person()
+test_circle()
+test_vehicle()
+test_dynamic_class()
 test_validated_attribute()
