@@ -41,5 +41,5 @@ jobs:
 
     - name: Test with unittest S20
       run: |
- .      pip install marshmallow
+        pip install marshmallow
         pytest --maxfail=1 --disable-warnings -q
