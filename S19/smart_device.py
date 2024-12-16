@@ -41,6 +41,12 @@ class SmartDevice:
         self.is_online = is_online
         self.status = {}
         SmartDevice.device_count += 1
+        self._device_info_func = lambda: {
+            'device_name': self.device_name,
+            'model_number': self.model_number,
+            'is_online': self.is_online,
+            'status': self.status
+        }
 
     def update_status(self, attribute, value):
         self.status[attribute] = value
@@ -55,13 +61,17 @@ class SmartDevice:
         self.status = {}
 
     def __call__(self):
-        return f'{self.device_name} {self.model_number}'
+        return f"{self.device_name} (Model: {self.model_number})"
 
     @property
     def device_info(self):
-        return {
-            'device_name': self.device_name,
-            'model_number': self.model_number,
-            'is_online': self.is_online,
-            'status': self.status
-        }
+        if callable(self._device_info_func):
+            result = self._device_info_func()
+            if callable(result):  # If the function returns another function
+                return result
+            return lambda: result  # Wrap the result in a lambda to make it callable
+        return lambda: self._device_info_func
+
+    @device_info.setter
+    def device_info(self, func):
+        self._device_info_func = func

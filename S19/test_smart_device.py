@@ -1,7 +1,7 @@
 import pytest
 from smart_device import SmartDevice
 
-def test_initialization():
+def test_initialization( ):
     device = SmartDevice("Thermostat", "T-1000")
     assert device.device_name == "Thermostat"
     assert device.model_number == "T-1000"
@@ -64,9 +64,10 @@ def test_empty_status_after_reset():
     assert device.status == {}
 
 def test_multiple_devices():
+    initial_count = SmartDevice.device_count  # Get current count
     device1 = SmartDevice("Microwave", "M-1100")
     device2 = SmartDevice("Oven", "O-1200")
-    assert SmartDevice.device_count == 5
+    assert SmartDevice.device_count == initial_count + 2
 
 def test_device_call_function():
     device = SmartDevice("Router", "R-1300")

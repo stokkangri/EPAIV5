@@ -17,6 +17,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest
+        pip install marshmallow
 
     #- name: Test with unittest
     #  run: |
@@ -41,6 +42,5 @@ jobs:
 
     - name: Test with unittest S20
       run: |
-        #pip install marshmallow
-        #pytest --maxfail=1 --disable-warnings -q
-        python S20/clases_test.py
+        pytest --maxfail=1 --disable-warnings -q
+        #python S20/clases_test.py

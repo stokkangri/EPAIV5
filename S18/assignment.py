@@ -97,7 +97,7 @@ def deserialize_activity(json_string):
 class StockSchema(Schema):
     symbol = fields.Str()
     date = fields.Date()
-    open = fields.Decimal(as_string=True)
+    open_ = fields.Decimal(data_key="open", as_string=True, attribute="open")
     high = fields.Decimal(as_string=True)
     low = fields.Decimal(as_string=True)
     close = fields.Decimal(as_string=True)
@@ -105,6 +105,9 @@ class StockSchema(Schema):
 
     @post_load
     def make_stock(self, data, **kwargs):
+        #print(f"data: {data}, kwargs: {kwargs}")
+        if 'open' in data:
+            data['open_'] = data.pop('open')
         return Stock(**data)
 
 class TradeSchema(Schema):
@@ -119,22 +122,61 @@ class TradeSchema(Schema):
     def make_trade(self, data, **kwargs):
         return Trade(**data)
 
-def serialize_with_marshmallow(activity):
-    """Serialize activity dictionary using Marshmallow."""
-    stock_schema = StockSchema(many=True)
-    trade_schema = TradeSchema(many=True)
-    return {
-        "quotes": stock_schema.dump(activity["quotes"]),
-        "trades": trade_schema.dump(activity["trades"])
-    }
+def serialize_with_marshmallow(data):
+    """Serialize data using Marshmallow.
+    
+    Args:
+        data: Can be either a single Stock/Trade object or an activity dictionary
+    Returns:
+        str: JSON string representation of the serialized data
+    """
+    if isinstance(data, Stock):
+        stock_schema = StockSchema()
+        print (f"Stock data {data.open}")
+        serialized = stock_schema.dump(data)
+        print (f"Dump stock data {serialized}")
+        if "open_" in serialized:
+            serialized["open"] = serialized.pop("open_")
+        return json.dumps(serialized)
+    elif isinstance(data, Trade):
+        trade_schema = TradeSchema()
+        return json.dumps(trade_schema.dump(data))
+    elif isinstance(data, dict) and "quotes" in data and "trades" in data:
+        stock_schema = StockSchema(many=True)
+        trade_schema = TradeSchema(many=True)
+        quotes_data = stock_schema.dump(data["quotes"])
+        for quote in quotes_data:
+            if "open_" in quote:
+                quote["open"] = quote.pop("open_")
+        return json.dumps({
+            "quotes": quotes_data,
+            "trades": trade_schema.dump(data["trades"])
+        })
+    return json.dumps(data)
 
-def deserialize_with_marshmallow(json_data):
-    """Deserialize JSON data into an activity dictionary containing Stock and Trade objects."""
-    stock_schema = StockSchema(many=True)
-    trade_schema = TradeSchema(many=True)
-    quotes = stock_schema.load(json_data["quotes"])
-    trades = trade_schema.load(json_data["trades"])
-    return {
-        "quotes": quotes,
-        "trades": trades
-    }
+def deserialize_with_marshmallow(json_data, schema=None):
+    """Deserialize JSON data into objects using Marshmallow.
+    
+    Args:
+        json_data: Can be either a JSON string or a dictionary
+        schema: Optional schema to use for deserialization
+    """
+    # Convert JSON string to dict if needed
+    if isinstance(json_data, str):
+        json_data = json.loads(json_data)
+    
+    print (f"Type of json_data {type(json_data)} {json_data}")
+    if schema is not None:
+        return schema.load(json_data)
+    elif isinstance(json_data, dict):
+        if "quotes" in json_data and "trades" in json_data:
+            stock_schema = StockSchema(many=True)
+            trade_schema = TradeSchema(many=True)
+            return {
+                "quotes": stock_schema.load(json_data["quotes"]),
+                "trades": trade_schema.load(json_data["trades"])
+            }
+        elif "__type__" in json_data:
+            schema = StockSchema() if json_data["__type__"] == "Stock" else TradeSchema()
+            return schema.load(json_data)
+    return json_data

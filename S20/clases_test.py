@@ -50,9 +50,3 @@ def test_validated_attribute():
     assert validated_attr.value == 100
     with pytest.raises(ValueError):
            validated_attr.value = -10  # Should raise error for negative value
-
-test_person()
-test_circle()
-test_vehicle()
-test_dynamic_class()
-test_validated_attribute()
